@@ -16,7 +16,7 @@ import java.util.Map;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private int id = 1;
+    private int id = 0;
     private Map<Integer, Film> films = new HashMap<>();
 
     @GetMapping
@@ -67,7 +67,7 @@ public class FilmController {
             log.warn("Ошибка Валидации " + film.getReleaseDate() + " некорректный");
             throw new ValidationException("Ошибка Валидации " + film.getReleaseDate() + " слишком рано");
         }
-        if (film.getDuration().getSeconds() < 0) {
+        if (film.getDuration() < 0) {
             log.warn("Ошибка Валидации " + film.getDuration() + " некорректный");
             throw new ValidationException("Ошибка Валидации " + film.getDuration()
                     + " продолжительность фильма должна быть положительной");
