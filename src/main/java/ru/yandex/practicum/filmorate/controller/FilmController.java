@@ -1,9 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ObjectAlreadyExistException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
@@ -37,7 +38,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody @Valid Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         validateReleaseData(film.getReleaseDate());
 
         if (films.containsKey(film.getId())) {
@@ -57,7 +58,7 @@ public class FilmController {
     private void validateReleaseData(LocalDate localDate) {
         if (localDate.isBefore(MIN_RELEASE_DATA_FILM)) {
             log.warn("Ошибка Валидации " + localDate + " некорректная");
-            throw new ValidationException("Ошибка Валидации " + localDate + " некорректная дата");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
 }

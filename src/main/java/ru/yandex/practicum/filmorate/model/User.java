@@ -16,7 +16,7 @@ public class User {
     @Email (message = "Некорректный email")
     private String email;
 
-    @NotEmpty
+    @NotBlank
     private String login;
 
     private String name;

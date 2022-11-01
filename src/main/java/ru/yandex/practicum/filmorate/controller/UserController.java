@@ -1,9 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ObjectAlreadyExistException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
@@ -60,7 +61,7 @@ public class UserController {
     private void validateWhitespaceLogin(String login) {
         if (login.contains(WHITESPACE)) {
             log.warn("Ошибка Валидации " + login + " содержит пробелы");
-            throw new ValidationException("Ошибка Валидации " + login + " содержит пробелы");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
 }

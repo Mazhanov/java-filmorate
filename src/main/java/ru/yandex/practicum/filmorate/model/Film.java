@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class Film {
     private int id;
 
-    @NotEmpty
+    @NotBlank
     private String name;
 
     @Size(max = 200)
