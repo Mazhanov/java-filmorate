@@ -34,11 +34,6 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content("{\n  \"login\": \"\",\n  \"name\": \"name\",\n  \"email\": \"mail@mail.ru\",\n  \"birthday\": \"1946-08-20\"\n}"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                        .contentType("application/json")
-                        .content("{\n  \"login\": \"login login\",\n  \"name\": \"name\",\n  \"email\": \"mail@mail.ru\",\n  \"birthday\": \"1946-08-20\"\n}"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
