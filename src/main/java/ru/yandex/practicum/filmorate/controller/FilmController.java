@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ObjectAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,31 +17,32 @@ import java.util.Map;
 @Slf4j
 public class FilmController {
     private int id = 0;
-    private Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
+    private static final LocalDate MIN_RELEASE_DATA_FILM = LocalDate.of(1895, 12, 27);
 
     @GetMapping
     public Collection<Film> getFilms() {
-        log.debug("запрос GET /films обработан");
+        log.info("запрос GET /films обработан");
         return films.values();
     }
 
     @PostMapping
-    public Film postFilm(@RequestBody Film film) {
-        checkValidation(film);
+    public Film createFilm(@RequestBody @Valid Film film) {
+        validateReleaseData(film.getReleaseDate());
         generateId(film);
 
         films.put(film.getId(), film);
-        log.debug("запрос POST /films обработан, фильм добавлен");
+        log.info("Добавлен фильм " + film);
         return film;
     }
 
     @PutMapping
-    public Film putFilm(@RequestBody Film film) {
-        checkValidation(film);
+    public Film updateFilm(@RequestBody @Valid Film film) {
+        validateReleaseData(film.getReleaseDate());
 
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
-            log.debug("запрос PUT /users обработан, фильм обновлен");
+            log.info("Обновлен фильм " + film);
             return film;
         } else {
             throw new ObjectAlreadyExistException("Фильм с id " + film.getId() + " не найден");
@@ -53,24 +54,10 @@ public class FilmController {
         film.setId(id);
     }
 
-
-    private void checkValidation(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
-            log.warn("Ошибка Валидации " + film.getName() + " некорректный");
-            throw new ValidationException("Ошибка Валидации " + film.getName() + " некорректный");
-        }
-        if (film.getDescription().length() > 200) {
-            log.warn("Ошибка Валидации " + film.getDescription() + " некорректный");
-            throw new ValidationException("Ошибка Валидации " + film.getDescription() + " больше 200символов");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 27))) {
-            log.warn("Ошибка Валидации " + film.getReleaseDate() + " некорректный");
-            throw new ValidationException("Ошибка Валидации " + film.getReleaseDate() + " слишком рано");
-        }
-        if (film.getDuration() < 0) {
-            log.warn("Ошибка Валидации " + film.getDuration() + " некорректный");
-            throw new ValidationException("Ошибка Валидации " + film.getDuration()
-                    + " продолжительность фильма должна быть положительной");
+    private void validateReleaseData(LocalDate localDate) {
+        if (localDate.isBefore(MIN_RELEASE_DATA_FILM)) {
+            log.warn("Ошибка Валидации " + localDate + " некорректная");
+            throw new ValidationException("Ошибка Валидации " + localDate + " некорректная дата");
         }
     }
 }

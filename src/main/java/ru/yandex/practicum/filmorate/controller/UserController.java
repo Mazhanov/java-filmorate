@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.exception.ObjectAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,17 +16,18 @@ import java.util.Map;
 @Slf4j
 public class UserController {
     private int id = 0;
-    private Map<Integer, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
+    private static final String WHITESPACE = " ";
 
     @GetMapping
     public Collection<User> getUsers() {
-        log.debug("запрос GET /users обработан");
+        log.info("запрос GET /users обработан");
         return users.values();
     }
 
     @PostMapping
-    public User addUser(@RequestBody User user) {
-        checkValidation(user);
+    public User createUser(@RequestBody @Valid User user) {
+        validateWhitespaceLogin(user.getLogin());
         generateId(user);
 
         if (user.getName() == null || user.getEmail().isBlank()) {
@@ -34,17 +35,17 @@ public class UserController {
         }
 
         users.put(user.getId(), user);
-        log.debug("запрос POST /users обработан, пользователь добавлен");
+        log.info("Добавлен пользователь " + user);
         return user;
     }
 
     @PutMapping
-    public User putUser(@RequestBody User user) {
-        checkValidation(user);
+    public User updateUser(@RequestBody @Valid User user) {
+        validateWhitespaceLogin(user.getLogin());
 
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
-            log.debug("запрос PUT /users обработан, пользователь обновлен");
+            log.info("Обновленны данные пользователя " + user);
             return user;
         } else {
             throw new ObjectAlreadyExistException("Пользователя с id " + user.getId() + " не найден");
@@ -56,18 +57,10 @@ public class UserController {
         user.setId(id);
     }
 
-    private void checkValidation (User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank() || !(user.getEmail().contains("@"))) {
-            log.warn("Ошибка Валидации " + user.getEmail() + " некорректный");
-            throw new ValidationException("Ошибка Валидации " + user.getEmail() + " некорректный");
-        }
-        if (user.getLogin().isBlank() || user.getLogin() == null || (user.getLogin().contains(" "))) {
-            log.warn("Ошибка Валидации " + user.getLogin() + " некорректный");
-            throw new ValidationException("Ошибка Валидации " + user.getLogin() + " некорректный");
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Ошибка Валидации " + user.getBirthday() + " некорректный");
-            throw new ValidationException("Ошибка Валидации " + user.getBirthday() + " дата рождения не может быть в будущем");
+    private void validateWhitespaceLogin(String login) {
+        if (login.contains(WHITESPACE)) {
+            log.warn("Ошибка Валидации " + login + " содержит пробелы");
+            throw new ValidationException("Ошибка Валидации " + login + " содержит пробелы");
         }
     }
 }
