@@ -20,7 +20,6 @@ public class User {
     private String email;
 
     @NotBlank
-    @NotNull
     private String login;
 
     private String name;
