@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Data
@@ -19,7 +16,7 @@ public class User {
     @Email (message = "Некорректный email")
     private String email;
 
-    @NotBlank
+    @NotEmpty
     private String login;
 
     private String name;
