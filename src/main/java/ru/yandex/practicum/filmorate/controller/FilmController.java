@@ -19,7 +19,7 @@ import java.util.Map;
 public class FilmController {
     private int id = 0;
     private final Map<Integer, Film> films = new HashMap<>();
-    private static final LocalDate MIN_RELEASE_DATA_FILM = LocalDate.of(1895, 12, 27);
+    private static final LocalDate MIN_RELEASE_DATA_FILM = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> getFilms() {
@@ -28,12 +28,12 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@RequestBody @Valid Film film) {
+    public Film createFilm(@Valid @RequestBody Film film) {
         validateReleaseData(film.getReleaseDate());
         generateId(film);
 
         films.put(film.getId(), film);
-        log.info("Добавлен фильм " + film);
+        log.info("Добавлен фильм { }" + film);
         return film;
     }
 
@@ -43,10 +43,11 @@ public class FilmController {
 
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
-            log.info("Обновлен фильм " + film);
+            log.info("Обновлен фильм { }" + film);
             return film;
         } else {
-            throw new ObjectAlreadyExistException("Фильм с id " + film.getId() + " не найден");
+            log.warn("Фильм с id " + film.getId() + " не найден");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
 

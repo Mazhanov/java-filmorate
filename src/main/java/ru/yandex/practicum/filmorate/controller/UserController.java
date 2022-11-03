@@ -18,7 +18,6 @@ import java.util.Map;
 public class UserController {
     private int id = 0;
     private final Map<Integer, User> users = new HashMap<>();
-    private static final String WHITESPACE = " ";
 
     @GetMapping
     public Collection<User> getUsers() {
@@ -27,29 +26,28 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody @Valid User user) {
+    public User createUser(@Valid @RequestBody User user) {
         validateWhitespaceLogin(user.getLogin());
         generateId(user);
-
-        if (user.getName() == null || user.getEmail().isBlank()) {
-            user.setName(user.getLogin());
-        }
+        checkNameUser(user);
 
         users.put(user.getId(), user);
-        log.info("Добавлен пользователь " + user);
+        log.info("Добавлен пользователь { }" + user);
         return user;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody @Valid User user) {
+    public User updateUser(@Valid @RequestBody User user) {
         validateWhitespaceLogin(user.getLogin());
 
         if (users.containsKey(user.getId())) {
+            checkNameUser(user);
             users.put(user.getId(), user);
-            log.info("Обновленны данные пользователя " + user);
+            log.info("Обновленны данные пользователя { }" + user);
             return user;
         } else {
-            throw new ObjectAlreadyExistException("Пользователя с id " + user.getId() + " не найден");
+            log.warn("Пользователя с id " + user.getId() + " не найден");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -59,9 +57,15 @@ public class UserController {
     }
 
     private void validateWhitespaceLogin(String login) {
-        if (login.contains(WHITESPACE)) {
+        if (login.contains(" ")) {
             log.warn("Ошибка Валидации " + login + " содержит пробелы");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void checkNameUser(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
         }
     }
 }
