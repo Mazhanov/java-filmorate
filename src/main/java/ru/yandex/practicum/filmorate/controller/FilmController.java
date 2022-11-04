@@ -47,7 +47,7 @@ public class FilmController {
             return film;
         } else {
             log.warn("Фильм с id " + film.getId() + " не найден");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ObjectAlreadyExistException(HttpStatus.NOT_FOUND);
         }
     }
 

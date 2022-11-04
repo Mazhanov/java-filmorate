@@ -47,7 +47,7 @@ public class UserController {
             return user;
         } else {
             log.warn("Пользователя с id " + user.getId() + " не найден");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ObjectAlreadyExistException(HttpStatus.NOT_FOUND);
         }
     }
 

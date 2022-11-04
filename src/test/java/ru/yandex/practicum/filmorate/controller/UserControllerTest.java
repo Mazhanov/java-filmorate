@@ -86,7 +86,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void updateUser() throws Exception {
+    public void updateAddedUser() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType("application/json")
                         .content("{\n  \"login\": \"login\",\n  \"name\": \"name\",\n  \"email\": \"mail@mail.ru\",\n "
@@ -98,11 +98,14 @@ class UserControllerTest {
                         .content("{\n \"id\": 1,\n \"login\": \"login\",\n  \"name\": \"name\",\n  \"email\": "
                                 + "\"mail@mail.ru\",\n  \"birthday\": \"1999-08-20\"\n}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
+    @Test
+    public void updateNotAddedUser() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
                         .contentType("application/json")
                         .content("{\n \"id\": 3,\n \"login\": \"login\",\n  \"name\": \"name\",\n  \"email\": "
                                 + "\"mail@mail.ru\",\n  \"birthday\": \"1999-08-20\"\n}"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }

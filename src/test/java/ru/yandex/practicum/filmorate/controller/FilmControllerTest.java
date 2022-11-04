@@ -91,7 +91,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilm() throws Exception {
+    public void updateAddedFilm() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType("application/json")
                         .content("{\n \"name\": \"name\",\n  \"description\": "
@@ -103,11 +103,14 @@ class FilmControllerTest {
                         .content("{\n  \"id\": 1,\n \"name\": \"name\",\n  \"description\": "
                                 + "\"Description\",\n  \"releaseDate\": \"1900-03-25\",\n  \"duration\": 10\n}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
+    @Test
+    public void updateNotAddedFilm() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType("application/json")
                         .content("{\n  \"id\": 3,\n \"name\": \"name\",\n  \"description\": "
                                 + "\"Description\",\n  \"releaseDate\": \"1900-03-25\",\n  \"duration\": 10\n}"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }
