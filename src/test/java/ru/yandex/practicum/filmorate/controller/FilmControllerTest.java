@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 class FilmControllerTest {
     @Autowired
     MockMvc mockMvc;
-    private ObjectMapper objectMapper = new ObjectMapper();;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void incorrectName() throws Exception {

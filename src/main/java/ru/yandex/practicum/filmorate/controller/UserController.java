@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.yandex.practicum.filmorate.exception.ObjectAlreadyExistException;
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
@@ -32,7 +32,7 @@ public class UserController {
         checkNameUser(user);
 
         users.put(user.getId(), user);
-        log.info("Добавлен пользователь { }" + user);
+        log.info("Добавлен пользователь {}", user);
         return user;
     }
 
@@ -43,11 +43,11 @@ public class UserController {
         if (users.containsKey(user.getId())) {
             checkNameUser(user);
             users.put(user.getId(), user);
-            log.info("Обновленны данные пользователя { }" + user);
+            log.info("Обноавленны данные пользовтеля {}", user);
             return user;
         } else {
-            log.warn("Пользователя с id " + user.getId() + " не найден");
-            throw new ObjectAlreadyExistException(HttpStatus.NOT_FOUND);
+            log.warn("Пользователь с id {} не найден", user.getId());
+            throw new ObjectNotFoundException(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -58,7 +58,7 @@ public class UserController {
 
     private void validateWhitespaceLogin(String login) {
         if (login.contains(" ")) {
-            log.warn("Ошибка Валидации " + login + " содержит пробелы");
+            log.warn("Ошибка Валидации {} содержит пробелы", login);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
