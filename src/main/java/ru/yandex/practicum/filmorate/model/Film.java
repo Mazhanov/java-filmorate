@@ -4,6 +4,8 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -19,4 +21,6 @@ public class Film {
 
     @Positive
     private long duration;
+
+    private Set<Integer> likes = new HashSet<>(); // Хранит id пользователей лайкнувших фильм
 }

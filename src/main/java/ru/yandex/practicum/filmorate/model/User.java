@@ -1,15 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Setter;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-@AllArgsConstructor
 public class User {
+    private Set<Integer> friends = new HashSet<>();
+
+    @PositiveOrZero
     private int id;
 
     @Email (message = "Некорректный email")
