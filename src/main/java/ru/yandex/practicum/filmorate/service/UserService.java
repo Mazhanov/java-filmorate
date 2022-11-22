@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,6 +27,7 @@ public class UserService {
     public User getUser(int id) {
         return userStorage.getUser(id);
     }
+
     public Collection<User> getUsers() {
         log.info("Возвращен список пользователей");
         return users.values();
@@ -53,7 +55,6 @@ public class UserService {
         if (user.getFriends() == null || friend.getFriends() == null) {
             userStorage.getUser(userId).getFriends().add(friendId);
             friend.getFriends().add(userId);
-            log.info("Пользователи добавлены в друзья {} и {}", user, friend);
             return user;
         }
 
@@ -78,7 +79,6 @@ public class UserService {
         if (user.getFriends().contains(friendId)) {
             user.getFriends().remove(friendId);
             friend.getFriends().remove(userId);
-            log.info("Пользователи удалены друг у друга из друзей {} и {}", user, friend);
             return user;
         } else {
             throw new UsersNotFriendsException(String.format("Пользователи %s и %s не находятся в друзьях, " +
@@ -103,26 +103,13 @@ public class UserService {
         checkingPresenceUser(userId);
         checkingPresenceUser(otherId);
 
-        List<User> commonFriends = new ArrayList<>();
-
         Set<Integer> friendsUser = users.get(userId).getFriends();
         Set<Integer> friendsUserSecond = users.get(otherId).getFriends();
 
-        if (friendsUser == null || friendsUserSecond == null) {
-            log.info("Возвращен пустой список общих друзей пользователей {} и {}, " +
-                    "так как спсиок друзей у одного из пользователей пуст", users.get(userId), users.get(otherId));
-            return commonFriends;
-        }
-
-        for (Integer friendUser: friendsUser) {
-            for (Integer friendSecondUser : friendsUserSecond) {
-                if (friendUser.equals(friendSecondUser)) {
-                    commonFriends.add(users.get(friendUser));
-                }
-            }
-        }
-        log.info("Возвращен список общих друзей пользователей {} и {}", users.get(userId), users.get(otherId));
-        return commonFriends;
+        return friendsUser.stream()
+                .filter(friendsUserSecond::contains)
+                .map(userStorage::getUser)
+                .collect(Collectors.toList());
     }
 
     private void checkingPresenceUser(Integer userId) { // Проверка наличия пользователя в хранилище

@@ -24,7 +24,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film getFilm(int id) {
         if (films.containsKey(id)) {
-            log.info("Возвращен фильм {}", films.get(id));
             return films.get(id);
         } else {
             throw new ObjectNotFoundException("Фильм с id" + id + " не найден");
@@ -32,9 +31,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getFilms() {
-        log.info("Возвращен список всех фильмов");
-        return films.values();
+    public Map<Integer, Film> getFilms() {
+        return films;
     }
 
     @Override
@@ -43,7 +41,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         generateId(film);
 
         films.put(film.getId(), film);
-        log.info("Добавлен фильм {}", film);
         return film;
     }
 
@@ -53,7 +50,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
-            log.info("Обновлен фильм {}", film);
             return film;
         } else {
             log.warn("Фильм с id {} не найден", film.getId());

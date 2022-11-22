@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -16,48 +15,60 @@ import java.util.List;
 public class FilmController {
     private final FilmService filmService;
 
-    @Autowired
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable int id) {
-        return filmService.getFilm(id);
+        Film film = filmService.getFilm(id);
+        log.info("Возвращен фильм {}", id);
+        return film;
     }
 
     @GetMapping
     public Collection<Film> getFilms() {
-        return filmService.getFilms();
+        Collection<Film> films = filmService.getFilms();
+        log.info("Возвращен список всех фильмов");
+        return films;
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        return filmService.createFilm(film);
+        Film newFilm = filmService.createFilm(film);
+        log.info("Добавлен фильм {}", film);
+        return newFilm;
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return filmService.updateFilm(film);
+        Film updateFilm = filmService.updateFilm(film);
+        log.info("Обновлен фильм {}", film);
+        return updateFilm;
     }
 
     @DeleteMapping
     public void removeFilm(@Valid @RequestBody Film film) {
         filmService.removeFilm(film);
+        log.info("Удален фильм {}", film);
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable int id, @PathVariable int userId) {
         filmService.addLike(id, userId);
+        log.info("Пользователь {} лайкнул фильм {}", userId, filmService.getFilm(id));
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable int id, @PathVariable int userId) {
         filmService.removeLike(id, userId);
+        log.info("Лайк пользователя {} удален с фильма {}", userId, filmService.getFilm(id));
     }
 
     @GetMapping("/popular")
     public List<Film> getTopFilms(@RequestParam(defaultValue = "10") int count) {
-        return filmService.getTopFilms(count);
+        List<Film> topFilms = filmService.getTopFilms(count);
+        log.info("Возвращен список популярных фильмой");
+        return topFilms;
     }
 }

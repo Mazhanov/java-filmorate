@@ -24,7 +24,7 @@ public class FilmService {
         return filmStorage.getFilm(id);
     }
     public Collection<Film> getFilms() {
-        return filmStorage.getFilms();
+        return filmStorage.getFilms().values();
     }
 
     public Film createFilm(Film film) {
@@ -41,9 +41,7 @@ public class FilmService {
 
     public void addLike(int filmId, int userId) {
         checkingPresenceFilm(filmId);
-
         filmStorage.getFilm(filmId).getLikes().add(userId);
-        log.info("Пользователь {} лайкнул фильм {}", userId, filmStorage.getFilm(filmId));
     }
 
     public void removeLike(int filmId, int userId) {
@@ -57,7 +55,6 @@ public class FilmService {
 
         if (film.getLikes().contains(userId)) {
             film.getLikes().remove(userId);
-            log.info("Лайк пользователя {} удален с фильма {}", userId, film);
         } else {
             throw new ObjectNotFoundException(String.format("Пользователь с id %s не ставил лайк фильму с id %s",
                     userId, filmId));
@@ -65,17 +62,15 @@ public class FilmService {
     }
 
     public List<Film> getTopFilms(int countFilms) {
-        return filmStorage.getFilms().stream()
+        return filmStorage.getFilms().values().stream()
                 .sorted((o1, o2) -> Integer.compare(o2.getLikes().size(), o1.getLikes().size()))
                 .limit(countFilms)
                 .collect(Collectors.toList());
     }
 
     private void checkingPresenceFilm(Integer filmId) { // Проверка наличия фильма в хранилище
-        for (Film film : filmStorage.getFilms()) {
-            if (film.getId() == filmId) {
-                return;
-            }
+        if (filmStorage.getFilms().containsKey(filmId)) {
+            return;
         }
         throw new ObjectNotFoundException("Фильм с id" + filmId + " не найден");
     }

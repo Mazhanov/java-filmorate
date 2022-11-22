@@ -41,7 +41,6 @@ public class InMemoryUserStorage implements UserStorage {
         checkNameUser(user);
 
         users.put(user.getId(), user);
-        log.info("Добавлен пользователь {}", user);
         return user;
     }
 
@@ -64,7 +63,6 @@ public class InMemoryUserStorage implements UserStorage {
     public void removeUser(User user) {
 
         if (users.containsValue(user)) {
-            log.info("Удален пользователь {}", user);
             users.remove(user.getId());
         } else {
             log.warn("Не найден пользователь {}", user);
