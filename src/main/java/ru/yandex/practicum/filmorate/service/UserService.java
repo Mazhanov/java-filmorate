@@ -53,12 +53,17 @@ public class UserService {
         User friend = users.get(friendId);
 
         if (user.getFriends() == null || friend.getFriends() == null) {
-            userStorage.getUser(userId).getFriends().add(friendId);
-            friend.getFriends().add(userId);
+            Set<Integer> friendsUser = new HashSet<>();
+            friendsUser.add(friendId);
+            user.setFriends(friendsUser);
+
+            Set<Integer> friendsOtherUser = new HashSet<>();
+            friendsOtherUser.add(userId);
+            friend.setFriends(friendsOtherUser);
             return user;
         }
 
-        if (!(user.getFriends().contains(friendId))) {
+        if (!(friendshipCheck(userId, friendId))) {
             user.getFriends().add(friendId);
             friend.getFriends().add(userId);
             log.info("Пользователи добавлены в друзья {} и {}", user, friend);
@@ -76,7 +81,7 @@ public class UserService {
         User user = users.get(userId);
         User friend = users.get(friendId);
 
-        if (user.getFriends().contains(friendId)) {
+        if (friendshipCheck(userId, friendId)) {
             user.getFriends().remove(friendId);
             friend.getFriends().remove(userId);
             return user;
@@ -116,5 +121,9 @@ public class UserService {
         if (!(users.containsKey(userId))) {
             throw new ObjectNotFoundException("Пользователь с id" + userId + " не найден");
         }
+    }
+
+    private boolean friendshipCheck(Integer userId, Integer friendId) {
+        return userStorage.getUser(userId).getFriends().contains(friendId);
     }
 }

@@ -20,7 +20,7 @@ public class Film {
     private LocalDate releaseDate;
 
     @Positive
-    private long duration;
+    private int duration;
 
     private Set<Integer> likes = new HashSet<>(); // Хранит id пользователей лайкнувших фильм
 }
