@@ -1,71 +1,85 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private int id = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public Collection<User> getUsers() {
-        log.info("запрос GET /users обработан");
-        return users.values();
+        Collection<User> users = userService.getUsers();
+        log.info("Возвращен список пользователей");
+        return users;
     }
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        validateWhitespaceLogin(user.getLogin());
-        generateId(user);
-        checkNameUser(user);
-
-        users.put(user.getId(), user);
+        User newUser = userService.createUser(user);
         log.info("Добавлен пользователь {}", user);
-        return user;
+        return newUser;
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        validateWhitespaceLogin(user.getLogin());
-
-        if (users.containsKey(user.getId())) {
-            checkNameUser(user);
-            users.put(user.getId(), user);
-            log.info("Обноавленны данные пользовтеля {}", user);
-            return user;
-        } else {
-            log.warn("Пользователь с id {} не найден", user.getId());
-            throw new ObjectNotFoundException(HttpStatus.NOT_FOUND);
-        }
+        User updateUser = userService.updateUser(user);
+        log.info("Обновлен пользователь {}", user);
+        return updateUser;
     }
 
-    private void generateId(User user) {
-        id++;
-        user.setId(id);
+    @DeleteMapping
+    public void removeUser(@Valid @RequestBody User user) {
+        userService.removeUser(user);
+        log.info("Удален пользователь {}", user);
     }
 
-    private void validateWhitespaceLogin(String login) {
-        if (login.contains(" ")) {
-            log.warn("Ошибка Валидации {} содержит пробелы", login);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable int id, @PathVariable int friendId) {
+        User user = userService.addFriend(id, friendId);
+        log.info("Пользователи добавлены в друзья {} и {}", user, userService.getUser(friendId));
+        return user;
     }
 
-    private void checkNameUser(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        User user = userService.removeFriend(id, friendId);
+        log.info("Пользователи удалены друг у друга из друзей {} и {}", user, userService.getUser(friendId));
+        return user;
+    }
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable int id) {
+        User user = userService.getUser(id);
+        log.info("Возвращен пользователь {}", user);
+        return user;
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable int id) {
+        List<User> friendsUser = userService.getFriends(id);
+        log.info("Возвращен список друзей пользователя {}", userService.getUser(id));
+        return friendsUser;
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        List<User> commonFriends = userService.getCommonFriends(id, otherId);
+        log.info("Возвращен список общих друзей пользователей {} и {}", userService.getUser(id), userService.getUser(otherId));
+        return commonFriends;
     }
 }
