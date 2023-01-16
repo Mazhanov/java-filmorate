@@ -1,14 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -22,8 +19,8 @@ public class UserController {
     }
 
     @GetMapping
-    public Collection<User> getUsers() {
-        Collection<User> users = userService.getUsers();
+    public List<User> getUsers() {
+        List<User> users = userService.getUsers();
         log.info("Возвращен список пользователей");
         return users;
     }
@@ -49,17 +46,15 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable int id, @PathVariable int friendId) {
-        User user = userService.addFriend(id, friendId);
-        log.info("Пользователи добавлены в друзья {} и {}", user, userService.getUser(friendId));
-        return user;
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.addFriend(id, friendId);
+        log.info("Пользователь {} добавлен в друзья к пользователю {}", friendId, id);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User removeFriend(@PathVariable int id, @PathVariable int friendId) {
-        User user = userService.removeFriend(id, friendId);
-        log.info("Пользователи удалены друг у друга из друзей {} и {}", user, userService.getUser(friendId));
-        return user;
+    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.removeFriend(id, friendId);
+        log.info("Пользователь {} удален из друзей пользователя {}", friendId, id);
     }
 
     @GetMapping("/{id}")
@@ -78,7 +73,7 @@ public class UserController {
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
-        List<User> commonFriends = userService.getCommonFriends(id, otherId);
+        List<User> commonFriends = userService.getFriendsCommon(id, otherId);
         log.info("Возвращен список общих друзей пользователей {} и {}", userService.getUser(id), userService.getUser(otherId));
         return commonFriends;
     }
