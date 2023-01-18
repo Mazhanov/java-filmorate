@@ -15,8 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@Sql(statements = "DELETE FROM FILM")
-@Sql(statements = "ALTER TABLE FILM ALTER COLUMN FILM_ID RESTART WITH 1")
+@Sql({"/schema.sql", "/data.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmStorageTest {
     private final FilmStorage filmStorage;

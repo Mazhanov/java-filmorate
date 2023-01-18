@@ -13,8 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@Sql(statements = "DELETE FROM GENRE")
-@Sql(statements = "ALTER TABLE GENRE ALTER COLUMN GENRE_ID RESTART WITH 1")
+@Sql({"/schema.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class GenreStorageTest {
     private final GenreStorage genreStorage;

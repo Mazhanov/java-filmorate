@@ -14,9 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-//@Sql({"/schema.sql"})
-@Sql(statements = "DELETE FROM USERS")
-@Sql(statements = "ALTER TABLE USERS ALTER COLUMN USER_ID RESTART WITH 1")
+@Sql({"/schema.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserStorageTest {
     private final UserStorage userStorage;

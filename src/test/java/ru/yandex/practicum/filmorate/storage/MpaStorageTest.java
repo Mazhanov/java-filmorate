@@ -12,9 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@Sql(statements = "DELETE FROM FILM")
-@Sql(statements = "DELETE FROM MPA")
-@Sql(statements = "ALTER TABLE MPA ALTER COLUMN MPA_ID RESTART WITH 1")
+@Sql({"/schema.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class MpaStorageTest {
     private final MpaStorage mpaStorage;
