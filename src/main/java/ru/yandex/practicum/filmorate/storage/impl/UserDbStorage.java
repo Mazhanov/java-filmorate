@@ -1,22 +1,21 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-@Qualifier
 @Component
 @Slf4j
-public class UserDbStorage implements UserStorage{
+public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
@@ -30,17 +29,9 @@ public class UserDbStorage implements UserStorage{
         final List<User> users = jdbcTemplate.query(sqlQuery, this::makeUser, id);
         if (users.isEmpty()) {
             return null;
+        } else {
+            return users.get(0);
         }
-        return users.get(0);
-    }
-
-    private User makeUser(ResultSet rs, int id) throws SQLException {
-        return new User(rs.getInt("USER_ID"),
-                rs.getString("EMAIL"),
-                rs.getString("LOGIN"),
-                rs.getString("NAME"),
-                rs.getDate("BIRTHDAY").toLocalDate()
-        );
     }
 
     @Override
@@ -94,38 +85,12 @@ public class UserDbStorage implements UserStorage{
         jdbcTemplate.update(sqlQuery, user.getId());
     }
 
-    @Override
-    public void addFriend(int userId, int otherId) {
-        final String sqlQuery = "insert into FRIENDSHIP(USER_ID, FRIEND_ID) values (?, ?)";
-        jdbcTemplate.update(sqlQuery, userId, otherId);
-    }
-
-    @Override
-    public void removeFriend(int userId, int otherId) {
-        final String sqlQuery = "delete from FRIENDSHIP where USER_ID = ? AND FRIEND_ID = ?";
-        jdbcTemplate.update(sqlQuery, userId, otherId);
-    }
-
-    @Override
-    public List<User> getFriends(int userId) {
-        final String sqlQuery = "select u.USER_ID, u.EMAIL, u.LOGIN, u.NAME, u.BIRTHDAY " +
-                "from FRIENDSHIP AS f " +
-                "join USERS AS u ON f.FRIEND_ID = u.USER_ID " +
-                "where f.USER_ID = ?";
-        List<User> friendsUser = jdbcTemplate.query(sqlQuery, this::makeUser, userId);
-        return friendsUser;
-    }
-
-    @Override
-    public List<User> getFriendsCommon (Integer userId, Integer otherId) {
-        final String sqlQuery = "select u.USER_ID, u.EMAIL, u.LOGIN, u.NAME, u.BIRTHDAY " +
-                "from FRIENDSHIP AS f " +
-                "join USERS AS u ON f.FRIEND_ID = u.USER_ID " +
-                "where f.USER_ID = ? AND " +
-                "f.FRIEND_ID IN (" +
-                "select FRIEND_ID " +
-                "from FRIENDSHIP " +
-                "where USER_ID = ?)";
-        return jdbcTemplate.query(sqlQuery, this::makeUser, userId, otherId);
+    private User makeUser(ResultSet rs, int id) throws SQLException {
+        return new User(rs.getInt("USER_ID"),
+                rs.getString("EMAIL"),
+                rs.getString("LOGIN"),
+                rs.getString("NAME"),
+                rs.getDate("BIRTHDAY").toLocalDate()
+        );
     }
 }

@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS friendship (
     user_id INTEGER,
     friend_id INTEGER,
+    status BOOLEAN,
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
     FOREIGN KEY (friend_id) REFERENCES users (user_id) ON DELETE CASCADE
     );

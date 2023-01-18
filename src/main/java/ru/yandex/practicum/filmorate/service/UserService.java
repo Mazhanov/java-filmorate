@@ -4,23 +4,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
-import ru.yandex.practicum.filmorate.exception.UsersAlreadyFriendshipException;
-import ru.yandex.practicum.filmorate.exception.UsersNotFriendsException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.ValidationException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class UserService {
     private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, FriendStorage friendStorage) {
         this.userStorage = userStorage;
+        this.friendStorage = friendStorage;
     }
 
     public User getUser(int id) {
@@ -54,26 +54,26 @@ public class UserService {
         checkingPresenceUser(userId);
         checkingPresenceUser(friendId);
 
-        userStorage.addFriend(userId, friendId);
+        friendStorage.addFriend(userId, friendId);
     }
 
     public void removeFriend(Integer userId, Integer friendId) {
         checkingPresenceUser(userId);
         checkingPresenceUser(friendId);
 
-        userStorage.removeFriend(userId, friendId);
+        friendStorage.removeFriend(userId, friendId);
     }
 
     public List<User> getFriends(Integer userId) {
         checkingPresenceUser(userId);
-        return userStorage.getFriends(userId);
+        return friendStorage.getFriends(userId);
     }
 
     public List<User> getFriendsCommon(Integer userId, Integer otherId) {
         checkingPresenceUser(userId);
         checkingPresenceUser(otherId);
 
-        return userStorage.getFriendsCommon(userId, otherId);
+        return friendStorage.getFriendsCommon(userId, otherId);
     }
 
     private void checkingPresenceUser(Integer id) { // Проверка наличия пользователя в хранилище

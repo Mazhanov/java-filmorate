@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -20,16 +20,16 @@ public class Film {
 
     @Positive
     private int duration;
+    @NotNull
     private Mpa mpa;
-    private List<Genre> genres;
+    private Set<Genre> genres;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Mpa mpa, List<Genre> genres) {
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Mpa mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
-        this.genres = genres;
     }
 }

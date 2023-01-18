@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,24 +10,21 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.*;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Component
 @Service
 @Slf4j
-public class FilmDbStorage implements FilmStorage{
+public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
-    private GenreStorage genreStorage;
 
     @Autowired
-    public FilmDbStorage (JdbcTemplate jdbcTemplate, GenreStorage genreStorage) {
+    public FilmDbStorage (JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.genreStorage = genreStorage;
     }
 
     @Override
@@ -45,7 +42,7 @@ public class FilmDbStorage implements FilmStorage{
     @Override
     public List<Film> getFilms() {
         final String sqlQuery = "select * " +
-                "from FILM as f join MPA AS m ON f.MPA_ID = m.MPA_ID ";
+                "from FILM as f join MPA AS m ON f.MPA_ID = m.MPA_ID";
         return jdbcTemplate.query(sqlQuery, this::makeFilm);
     }
 
@@ -95,32 +92,6 @@ public class FilmDbStorage implements FilmStorage{
         jdbcTemplate.update(sqlQuery, film.getId());
     }
 
-    @Override
-    public void addLikeFilm(int filmId, int userId) {
-        String sqlQuery = "insert into LIKES(FILM_ID, USER_ID)" +
-                "values (?, ?)";
-        jdbcTemplate.update(sqlQuery, filmId, userId);
-    }
-
-    @Override
-    public void removeLike(int filmId, int userId) {
-        String sqlQuery = "delete from LIKES " +
-                "where FILM_ID = ? AND USER_ID = ?";
-        jdbcTemplate.update(sqlQuery, filmId, userId);
-    }
-
-    @Override
-    public List<Film> getPopularFilm(int count) {
-        final String sqlQuery = "select *, COUNT(l.FILM_ID) AS likes " +
-                "from FILM as f " +
-                "join MPA AS m ON f.MPA_ID = m.MPA_ID " +
-                "left join LIKES AS l ON f.FILM_ID = l.FILM_ID " +
-                "group by f.FILM_ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, f.MPA_ID, m.MPA_ID, m.NAME " +
-                "order by likes desc " +
-                "limit ?";
-        return jdbcTemplate.query(sqlQuery, this::makeFilm, count);
-    }
-
     private void updateFilmGenre(Film film) { // Обновление жарнов фильма
         String sqlQueryDeleteGenre = "delete from FILM_GENRE where FILM_ID = ?";
         jdbcTemplate.update(sqlQueryDeleteGenre, film.getId());
@@ -129,9 +100,7 @@ public class FilmDbStorage implements FilmStorage{
             return;
         }
 
-        Set<Genre> genres = new HashSet<>(film.getGenres());
-
-        for (Genre genre : genres) {
+        for (Genre genre : film.getGenres()) {
             String sqlQueryAddGenre = "insert into FILM_GENRE (FILM_ID, GENRE_ID) " +
                     "values (?, ?)";
             jdbcTemplate.update(sqlQueryAddGenre, film.getId(), genre.getId());
@@ -144,8 +113,7 @@ public class FilmDbStorage implements FilmStorage{
                 rs.getString("DESCRIPTION"),
                 rs.getDate("RELEASE_DATE").toLocalDate(),
                 rs.getInt("DURATION"),
-                new Mpa(rs.getInt("MPA_ID"), rs.getString("MPA.NAME")),
-                genreStorage.getByFilmId(rs.getInt("FILM_ID"))
+                new Mpa(rs.getInt("MPA_ID"), rs.getString("MPA.NAME"))
         );
     }
 }

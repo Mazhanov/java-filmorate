@@ -23,7 +23,7 @@
 ### Mpa
 - `[GET] /mpa` — get all mpas
 - `[GET] /mpa/{id}` — get mpa by id
-### Mpa
+### Genre
 - `[GET] /genres` — get all genres
 - `[GET] /genres/{id}` — get genre by id
 
