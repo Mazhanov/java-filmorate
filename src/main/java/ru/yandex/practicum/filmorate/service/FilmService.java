@@ -39,13 +39,11 @@ public class FilmService {
     }
     public Collection<Film> getFilms() {
         List<Film> films = filmStorage.getFilms();
-        List<Film> filmsWithGenre = new ArrayList<>();
 
-        for (Film film : films) {
-            filmsWithGenre.add(addGenre(film));
+        if (!films.isEmpty()) {
+            return genreStorage.addGenreForListFilm(films);
         }
-
-        return filmsWithGenre;
+        return films;
     }
 
     public Film createFilm(Film film) {

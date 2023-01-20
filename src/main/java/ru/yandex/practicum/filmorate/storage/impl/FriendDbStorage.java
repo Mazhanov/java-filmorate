@@ -61,4 +61,20 @@ public class FriendDbStorage implements FriendStorage {
                 rs.getDate("BIRTHDAY").toLocalDate()
         );
     }
+
+/*    @Override
+    public void addFriend(Integer userId, Integer otherId) {
+        final String sqlQuery = "create temp table ADD_FRIEND(USER_ID integer not null, FRIEND_ID integer not null, " +
+                "FALSE_STATUS boolean not null); " +
+                "insert into ADD_FRIEND(USER_ID, FRIEND_ID, FALSE_STATUS) values (?, ?, false); " +
+                "merge into FRIENDSHIP as f " +
+                "using ADD_FRIEND AS af " +
+                "on f.USER_ID = af.FRIEND_ID " +
+                "when matched and f.FRIEND_ID = af.USER_ID and f.STATUS = af.FALSE_STATUS then " +
+                "update set f.STATUS = true " +
+                "when not matched and f.USER_ID != af.USER_ID and f.FRIEND_ID != af.FRIEND_ID " +
+                "and f.STATUS != af.FALSE_STATUS then " +
+                "insert (USER_ID, FRIEND_ID, STATUS) values (af.USER_ID, af.FRIEND_ID, af.FALSE_STATUS);";
+        jdbcTemplate.update(sqlQuery, userId, otherId);
+    }*/
 }

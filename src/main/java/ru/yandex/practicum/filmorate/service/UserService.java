@@ -50,7 +50,7 @@ public class UserService {
         userStorage.removeUser(user);
     }
 
-    public void addFriend(int userId, int friendId) {
+    public void addFriend(Integer userId, Integer friendId) {
         checkingPresenceUser(userId);
         checkingPresenceUser(friendId);
 

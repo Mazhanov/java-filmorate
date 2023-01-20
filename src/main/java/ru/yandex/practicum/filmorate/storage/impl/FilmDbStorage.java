@@ -43,7 +43,8 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getFilms() {
         final String sqlQuery = "select * " +
                 "from FILM as f join MPA AS m ON f.MPA_ID = m.MPA_ID";
-        return jdbcTemplate.query(sqlQuery, this::makeFilm);
+        List<Film> films = jdbcTemplate.query(sqlQuery, this::makeFilm);
+        return films;
     }
 
     @Override

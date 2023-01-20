@@ -10,4 +10,5 @@ public interface GenreStorage {
     Genre getById(int id);
     Genre createGenre(Genre genre);
     Film addGenreForFilm(Film film);
+    List<Film> addGenreForListFilm(List<Film> films);
 }

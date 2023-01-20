@@ -11,10 +11,8 @@ import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class GenreDBStorage implements GenreStorage {
@@ -27,13 +25,13 @@ public class GenreDBStorage implements GenreStorage {
     @Override
     public List<Genre> getAll() {
         final String sqlQuery = "select * from GENRE order by GENRE_ID";
-        return jdbcTemplate.query(sqlQuery, this::makeGenre);
+        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeGenre(rs));
     }
 
     @Override
     public Genre getById(int id) {
         final String sqlQuery = "select * from GENRE where GENRE_ID = ?";
-        final List<Genre> genres = jdbcTemplate.query(sqlQuery, this::makeGenre, id);
+        final List<Genre> genres = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeGenre(rs), id);
         if (genres.isEmpty()) {
             return null;
         }
@@ -61,13 +59,32 @@ public class GenreDBStorage implements GenreStorage {
                 "join GENRE as g ON fg.GENRE_ID = g.GENRE_ID " +
                 "where fg.FILM_ID = ?" +
                 "order by g.GENRE_ID";
-        List<Genre> genres = jdbcTemplate.query(sqlQuery, this::makeGenre, film.getId());
+        List<Genre> genres = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeGenre(rs), film.getId());
         Set<Genre> genresSet = new HashSet<>(genres);
         film.setGenres(genresSet);
         return film;
     }
 
-    private Genre makeGenre(ResultSet rs, int id) throws SQLException {
+    @Override
+    public List<Film> addGenreForListFilm(List<Film> films) {
+
+        Map<Integer, Film> filmsMap = films.stream()
+                .collect(Collectors.toMap(Film::getId, film -> film));
+
+        String inSql = String.join(", ", Collections.nCopies(filmsMap.size(), "?"));
+
+        final String sqlQuery = "select * " +
+                "from FILM_GENRE as fg " +
+                "left outer join GENRE as g on fg.GENRE_ID = g.GENRE_ID " +
+                "where fg.FILM_ID in (" + inSql + ")";
+        jdbcTemplate.query(sqlQuery, (rs) -> {
+            filmsMap.get(rs.getInt("FILM_ID")).addGenre(makeGenre(rs));
+        }, filmsMap.keySet().toArray());
+
+        return new ArrayList<>(filmsMap.values());
+    }
+
+    private Genre makeGenre(ResultSet rs) throws SQLException {
         return new Genre(rs.getInt("GENRE_ID"),
                 rs.getString("GENRE.NAME")
         );

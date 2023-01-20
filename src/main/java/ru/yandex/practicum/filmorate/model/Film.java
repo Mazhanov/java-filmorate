@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -22,7 +23,14 @@ public class Film {
     private int duration;
     @NotNull
     private Mpa mpa;
-    private Set<Genre> genres;
+    private Set<Genre> genres = new HashSet<>();;
+
+    public void addGenre(Genre genre) {
+        if (genre == null) {
+            return;
+        }
+        genres.add(genre);
+    }
 
     public Film(int id, String name, String description, LocalDate releaseDate, int duration, Mpa mpa) {
         this.id = id;
