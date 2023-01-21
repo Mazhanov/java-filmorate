@@ -41,20 +41,6 @@ public class MpaDBStorage implements MpaStorage {
         return jdbcTemplate.query(sqlQuery, this::makeMpa);
     }
 
-    @Override
-    public Mpa createMpa(Mpa mpa) {
-        final String sqlQuery = "insert into MPA(NAME) values (?)";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"MPA_ID"});
-            stmt.setString(1, mpa.getName());
-            return stmt;
-        }, keyHolder);
-
-        mpa.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
-        return mpa;
-    }
-
     private Mpa makeMpa(ResultSet rs, int id) throws SQLException {
         return new Mpa(rs.getInt("MPA_ID"),
                 rs.getString("NAME")

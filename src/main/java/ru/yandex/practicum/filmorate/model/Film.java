@@ -26,7 +26,7 @@ public class Film {
     private Set<Genre> genres = new HashSet<>();;
 
     public void addGenre(Genre genre) {
-        if (genre == null) {
+        if (genre.getName() == null) {
             return;
         }
         genres.add(genre);

@@ -82,7 +82,7 @@ public class FilmDbStorage implements FilmStorage {
 
         if (changes == 1) {
             updateFilmGenre(film);
-            return getFilm(film.getId());
+            return film;
         }
         return null;
     }
@@ -106,6 +106,7 @@ public class FilmDbStorage implements FilmStorage {
                     "values (?, ?)";
             jdbcTemplate.update(sqlQueryAddGenre, film.getId(), genre.getId());
         }
+        film.getGenres().clear();
     }
 
     private Film makeFilm(ResultSet rs, int id) throws SQLException {

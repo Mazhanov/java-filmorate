@@ -34,29 +34,32 @@ public class FilmService {
     public Film getFilm(int id) {
         checkingPresenceFilm(id);
         Film film = filmStorage.getFilm(id);
-        Film filmWithGenre = addGenre(film);
-        return filmWithGenre;
+        genreStorage.addGenreForListFilm(Collections.singletonList(film));
+        return film;
     }
+
     public Collection<Film> getFilms() {
         List<Film> films = filmStorage.getFilms();
 
         if (!films.isEmpty()) {
-            return genreStorage.addGenreForListFilm(films);
+            genreStorage.addGenreForListFilm(films);
         }
         return films;
     }
 
     public Film createFilm(Film film) {
         validateReleaseData(film.getReleaseDate());
-        return filmStorage.createFilm(film);
+        Film newFilm = filmStorage.createFilm(film);
+        genreStorage.addGenreForListFilm(Collections.singletonList(newFilm));
+        return newFilm;
     }
 
     public Film updateFilm(Film film) {
         checkingPresenceFilm(film.getId());
         validateReleaseData(film.getReleaseDate());
         filmStorage.updateFilm(film);
-        Film filmWithGenre = addGenre(film);
-        return filmWithGenre;
+        genreStorage.addGenreForListFilm(Collections.singletonList(film));
+        return film;
     }
 
     public void removeFilm(Film film) {
@@ -78,12 +81,8 @@ public class FilmService {
 
     public List<Film> getTopFilms(int countFilms) {
         List<Film> films = likeStorage.getPopularFilm(countFilms);
-        List<Film> filmsWithGenre = new ArrayList<>();
-
-        for (Film film : films) {
-            filmsWithGenre.add(addGenre(film));
-        }
-        return filmsWithGenre;
+        genreStorage.addGenreForListFilm(films);
+        return films;
     }
 
     private void checkingPresenceFilm(Integer filmId) { // Проверка наличия фильма в хранилище
@@ -105,9 +104,5 @@ public class FilmService {
             log.warn("Ошибка Валидации дата {} некорректная", localDate);
             throw new ValidationException(String.format("Ошибка валидации, дата %s некорректная", localDate));
         }
-    }
-
-    private Film addGenre(Film film) {
-        return genreStorage.addGenreForFilm(film);
     }
 }

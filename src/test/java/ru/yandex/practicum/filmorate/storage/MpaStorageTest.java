@@ -12,32 +12,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@Sql({"/schema.sql"})
+@Sql({"/schema.sql", "/data.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class MpaStorageTest {
     private final MpaStorage mpaStorage;
-    private final Mpa mpa1 = getMpa(1);
+    private final Mpa mpa1 = getMpa(1, "G");
+    private final Mpa mpa2 = getMpa(2, "PG");
 
     @Test
-    public void getMpas() {
-        assertThat(mpaStorage.getAll()).isEmpty();
-        mpaStorage.createMpa(mpa1);
-        assertThat(mpaStorage.getAll()).hasSize(1);
+    public void getAll() {
+        assertThat(mpaStorage.getAll()).hasSize(5);
     }
 
     @Test
-    public void getMpaById() {
-        assertThat(mpaStorage.getById(1)).isNull();
-        mpaStorage.createMpa(mpa1);
+    public void getById() {
         assertThat(mpaStorage.getById(1)).isEqualTo(mpa1);
+        assertThat(mpaStorage.getById(2)).isEqualTo(mpa2);
     }
 
-    @Test
-    public void createMpa() {
-        assertThat(mpaStorage.createMpa(mpa1)).isEqualTo(mpa1);
-    }
-
-    private Mpa getMpa(Integer id) {
-        return new Mpa(id, "nameMpa");
+    private Mpa getMpa(Integer id, String name) {
+        return new Mpa(id, name);
     }
 }
