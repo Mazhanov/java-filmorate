@@ -22,21 +22,21 @@ public class FilmController {
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable int id) {
         Film film = filmService.getFilm(id);
-        log.info("Возвращен фильм {}", id);
+        log.info("Возвращен фильм {}", film);
         return film;
     }
 
     @GetMapping
     public Collection<Film> getFilms() {
         Collection<Film> films = filmService.getFilms();
-        log.info("Возвращен список всех фильмов");
+        log.info("Возвращен список всех фильмов {}", films);
         return films;
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         Film newFilm = filmService.createFilm(film);
-        log.info("Добавлен фильм {}", film);
+        log.info("Добавлен фильм {}", newFilm);
         return newFilm;
     }
 
@@ -68,7 +68,7 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getTopFilms(@RequestParam(defaultValue = "10") int count) {
         List<Film> topFilms = filmService.getTopFilms(count);
-        log.info("Возвращен список популярных фильмой");
+        log.info("Возвращен список популярных фильмов {}", topFilms);
         return topFilms;
     }
 }
